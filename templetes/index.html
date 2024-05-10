@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Monitoring</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .plotly-graph-div {
+            margin: auto;
+            width: 50%;
+            background-color: rgba(151, 128, 128, 0.688);
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {background-color: #f2f2f2;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>System Monitoring</h1>
+        <div id="cpu-gauge"></div>
+        <div id="mem-gauge"></div>
+        <div id="disk-gauge"></div>
+        <div id="battery-gauge"></div> <!-- Battery gauge container -->
+        {% if message %}
+        <div class="alert alert-danger">{{ message }}</div>
+        {% endif %}
+        <h2>Running Processes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>PID</th>
+                    <th>Name</th>
+                    <th>User</th>
+                    <th>CPU %</th>
+                    <th>Memory %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proc in processes_info %}
+                <tr>
+                    <td>{{ proc['pid'] }}</td>
+                    <td>{{ proc['name'] }}</td>
+                    <td>{{ proc['username'] }}</td>
+                    <td>{{ proc['cpu_percent'] }}</td>
+                    <td>{{ proc['memory_percent'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        var cpuGauge = {
+            type: "indicator",
+            mode: "gauge+number",
+            value: {{ cpu_metric }},
+            gauge: {
+                axis: { range: [null, 100] },
+                bar: { color: "#1f77b4" },
+                bgcolor: "white",
+                borderwidth: 2,
+                bordercolor: "#ccc",
+                steps: [
+                    { range: [0, 50], color: "#d9f0a3" },
+                    { range: [50, 85], color: "#ffeb84" },
+                    { range: [85, 100], color: "#ff5f5f" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: 90
+                }
+            }
+        };
+
+        var memGauge = {
+            type: "indicator",
+            mode: "gauge+number",
+            value: {{ mem_metric }},
+            gauge: {
+                axis: { range: [null, 100] },
+                bar: { color: "#1f77b4" },
+                bgcolor: "white",
+                borderwidth: 2,
+                bordercolor: "#ccc",
+                steps: [
+                    { range: [0, 50], color: "#d9f0a3" },
+                    { range: [50, 85], color: "#ffeb84" },
+                    { range: [85, 100], color: "#ff5f5f" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: 90
+                }
+            }
+        };
+
+        var diskGauge = {
+            type: "indicator",
+            mode: "gauge+number",
+            value: {{ disk_metric }},
+            gauge: {
+                axis: { range: [null, 100] },
+                bar: { color: "#1f77b4" },
+                bgcolor: "white",
+                borderwidth: 2,
+                bordercolor: "#ccc",
+                steps: [
+                    { range: [0, 50], color: "#d9f0a3" },
+                    { range: [50, 85], color: "#ffeb84" },
+                    { range: [85, 100], color: "#ff5f5f" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: 90
+                }
+            }
+        };
+
+        var batteryGauge = {
+            type: "indicator",
+            mode: "gauge+number",
+            value: {{ battery_metric }},
+            gauge: {
+                axis: { range: [null, 100] },
+                bar: { color: "#00cc96" },
+                bgcolor: "white",
+                borderwidth: 2,
+                bordercolor: "#ccc",
+                steps: [
+                    { range: [0, 20], color: "#ff5f5f" },
+                    { range: [20, 40], color: "#ffeb84" },
+                    { range: [40, 100], color: "#d9f0a3" }
+                ],
+                threshold: {
+                    line: { color: "red", width: 4 },
+                    thickness: 0.75,
+                    value: 20
+                }
+            }
+        };
+
+        var cpuGaugeLayout = { title: "CPU Utilization" };
+        var memGaugeLayout = { title: "Memory Utilization" };
+        var diskGaugeLayout = { title: "Disk Utilization" };
+        var batteryGaugeLayout = { title: "Battery Status" };
+        
+
+        Plotly.newPlot('cpu-gauge', [cpuGauge], cpuGaugeLayout);
+        Plotly.newPlot('mem-gauge', [memGauge], memGaugeLayout);
+        Plotly.newPlot('disk-gauge', [diskGauge], diskGaugeLayout);
+        Plotly.newPlot('battery-gauge', [batteryGauge], batteryGaugeLayout);
+    </script>
+</body>
+</html>
